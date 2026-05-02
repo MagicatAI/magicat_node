@@ -23,7 +23,7 @@ chmod +x "$XRAY_BIN"
 UUID=$("$XRAY_BIN" uuid)
 KEYS=$("$XRAY_BIN" x25519)
 PRIVATE_KEY=$(echo "$KEYS" | grep 'PrivateKey' | awk '{print $2}')
-PUBLIC_KEY=$(echo "$KEYS"  | grep 'Password'   | awk '{print $2}')
+PUBLIC_KEY=$(echo "$KEYS" | grep 'Password' | awk '{print $3}')
 SHORT_ID=$(openssl rand -hex 4)
 
 # 5. 写入配置文件
