@@ -16,6 +16,7 @@ sysctl -p
 mkdir -p /usr/local/bin /usr/local/etc/xray
 
 # 3. 下载内核
+systemctl stop xray 2>/dev/null || true
 curl -L -o "$XRAY_BIN" "$DOWNLOAD_URL"
 chmod +x "$XRAY_BIN"
 
