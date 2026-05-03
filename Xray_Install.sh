@@ -5,29 +5,29 @@ DOWNLOAD_URL="https://github.com/MagicatAI/magicat_X/releases/download/X_v1.0.0.
 XRAY_BIN="/usr/local/bin/xray"
 XRAY_CONF="/usr/local/etc/xray/config.json"
 
-# 1. 系统优化 (BBR) - 避免重复写入
+# 系统优化 (BBR)
 grep -q "tcp_congestion_control=bbr" /etc/sysctl.conf || {
   echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
   echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
 }
 sysctl -p
 
-# 2. 创建目录
+# 创建目录
 mkdir -p /usr/local/bin /usr/local/etc/xray
 
-# 3. 下载内核
+# 下载内核
 systemctl stop xray 2>/dev/null || true
 curl -L -o "$XRAY_BIN" "$DOWNLOAD_URL"
 chmod +x "$XRAY_BIN"
 
-# 4. 生成配置参数
+# 生成配置参数
 UUID=$("$XRAY_BIN" uuid)
 KEYS=$("$XRAY_BIN" x25519)
 PRIVATE_KEY=$(echo "$KEYS" | grep 'PrivateKey' | awk '{print $2}')
 PUBLIC_KEY=$(echo "$KEYS" | grep 'Password' | awk '{print $3}')
 SHORT_ID=$(openssl rand -hex 4)
 
-# 5. 写入配置文件
+# 写入配置文件
 cat > "$XRAY_CONF" << EOF
 {
   "log": {
@@ -72,7 +72,7 @@ cat > "$XRAY_CONF" << EOF
 }
 EOF
 
-# 6. 写入 Systemd 服务文件
+# 写入 Systemd 服务文件
 cat > /etc/systemd/system/xray.service << 'EOF'
 [Unit]
 Description=Xray Service
@@ -99,12 +99,15 @@ PrivateDevices=true
 WantedBy=multi-user.target
 EOF
 
-# 7. 启动服务（只启动一次）
+# 启动服务
 systemctl daemon-reload
 systemctl enable xray
 systemctl restart xray
 
-# 8. 输出客户端参数
+# 查看运行状态
+systemctl status xray --no-pager
+
+# 输出客户端参数
 sleep 2
 echo ""
 echo "======== 客户端配置参数 ========"
@@ -113,5 +116,3 @@ echo "PublicKey : ${PUBLIC_KEY}"
 echo "ShortId   : ${SHORT_ID}"
 echo "================================"
 echo ""
-
-systemctl status xray --no-pager
