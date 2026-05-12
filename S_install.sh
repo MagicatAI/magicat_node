@@ -1,9 +1,8 @@
 #!/bin/bash
 set -e  # 遇错即止
 
-DOWNLOAD_URL="https://github.com/MagicatAI/magicat_node/releases/download/node_v1.0.0.0/sing-box_1.13.11_linux_amd64.deb"
-DEB_PKG="/tmp/sing-box.deb"
-SINGBOX_BIN="/usr/bin/sing-box"
+DOWNLOAD_URL="https://github.com/MagicatAI/magicat_node/releases/download/node_v1.0.0.0/sing-box"
+SINGBOX_BIN="/usr/local/bin/sing-box"
 SINGBOX_CONF="/etc/sing-box/config.json"
 
 # 系统优化 (BBR)
@@ -13,11 +12,13 @@ grep -q "tcp_congestion_control=bbr" /etc/sysctl.conf || {
 }
 sysctl -p
 
-# 下载并安装 sing-box deb 包
+# 创建目录
+mkdir -p /etc/sing-box
+
+# 下载内核
 systemctl stop sing-box 2>/dev/null || true
-curl -L -o "$DEB_PKG" "$DOWNLOAD_URL"
-dpkg -i "$DEB_PKG"
-rm -f "$DEB_PKG"
+curl -L -o "$SINGBOX_BIN" "$DOWNLOAD_URL"
+chmod +x "$SINGBOX_BIN"
 
 # 生成配置参数
 UUID=$("$SINGBOX_BIN" generate uuid)
@@ -82,7 +83,7 @@ AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 NoNewPrivileges=true
 LimitNOFILE=1000000
 LimitNPROC=65535
-ExecStart=/usr/bin/sing-box run -c /etc/sing-box/config.json
+ExecStart=/usr/local/bin/sing-box run -c /etc/sing-box/config.json
 Restart=on-failure
 RestartSec=2s
 RestartPreventExitStatus=23
