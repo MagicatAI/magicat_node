@@ -1,5 +1,5 @@
-# magicat_X
-## 一键搭建 Reality + Xray 节点
+# magicat_node
+## 一键搭建 Reality + sing-box 节点
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/MagicatAI/magicat_X/main/Xray_Install.sh)
+sudo bash <(curl -Ls https://raw.githubusercontent.com/MagicatAI/magicat_node/main/S_install.sh)
 ```
