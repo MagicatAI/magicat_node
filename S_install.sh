@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e  # 遇错即止
 
+# 安装参数
 DOWNLOAD_URL="https://github.com/MagicatAI/magicat_node/releases/download/node_v1.0.0.0/sing-box"
 SINGBOX_BIN="/usr/local/bin/sing-box"
 SINGBOX_CONF="/etc/sing-box/config.json"
@@ -62,8 +63,7 @@ cat > "$SINGBOX_CONF" << EOF
   ],
   "outbounds": [
     {
-      "type": "direct",
-      "tag": "direct"
+      "type": "direct"
     }
   ]
 }
@@ -104,12 +104,15 @@ systemctl restart sing-box
 # 查看运行状态
 systemctl status sing-box --no-pager
 
-# 输出客户端参数
-sleep 2
-echo ""
-echo "======== 客户端配置参数 ========"
-echo "UUID      : ${UUID}"
-echo "PublicKey : ${PUBLIC_KEY}"
-echo "ShortId   : ${SHORT_ID}"
-echo "================================"
-echo ""
+# 获取服务器IP
+SERVER_IP=$(curl -s https://api.ipify.org)
+
+# 客户端配置
+cat << EOF
+{
+  "serverdomain": "${SERVER_IP}",
+  "uuid": "${UUID}",
+  "publicKey": "${PUBLIC_KEY}",
+  "shortid": "${SHORT_ID}"
+}
+EOF
