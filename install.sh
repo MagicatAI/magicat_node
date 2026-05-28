@@ -20,7 +20,7 @@ sysctl -p
 
 # 目录 & 内核
 mkdir -p /etc/sing-box
-systemctl stop sing-box || true
+systemctl stop sing-box 2>/dev/null || true
 curl -fL -o "$SINGBOX_BIN" "$DOWNLOAD_URL"
 chmod +x "$SINGBOX_BIN"
 
