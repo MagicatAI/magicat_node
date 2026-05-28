@@ -102,10 +102,10 @@ echo "------------------------------"
 echo "  Hysteria2 客户端配置"
 echo "------------------------------"
 cat << EOF
-    {
-      "serverip": "${SERVER_IP}",
-      "password": "${PASSWORD}"
-    }
+{
+  "serverip": "${SERVER_IP}",
+  "password": "${PASSWORD}"
+}
 EOF
 echo "------------------------------"
 echo "  自签名证书"
