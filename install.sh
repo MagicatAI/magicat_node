@@ -7,6 +7,7 @@ SINGBOX_BIN="/usr/local/bin/sing-box"
 SINGBOX_CONF="/etc/sing-box/config.json"
 SERVER_KEY="/etc/sing-box/server.key"
 SERVER_CRT="/etc/sing-box/server.crt"
+
 SERVER_IP=$(curl -s https://api.ipify.org)
 PASSWORD=$(openssl rand -base64 18 | tr -dc 'A-Za-z0-9' | head -c 24)
 
@@ -33,9 +34,6 @@ openssl req -x509 -nodes -newkey ec -pkeyopt ec_paramgen_curve:P-256 \
 
 chown nobody "$SERVER_KEY" "$SERVER_CRT"
 chmod 600 "$SERVER_KEY" "$SERVER_CRT"
-
-# 提取公钥计算 SHA256
-SERVER_CRT_PIN=$(openssl x509 -in certificate.pem -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64)
 
 # sing-box 配置
 cat > "$SINGBOX_CONF" << EOF
@@ -106,7 +104,11 @@ echo "------------------------------"
 cat << EOF
     {
       "serverip": "${SERVER_IP}",
-      "password": "${PASSWORD}",
-      "keySHA256": "${SERVER_CRT_PIN}"
+      "password": "${PASSWORD}"
     }
 EOF
+echo "------------------------------"
+echo "  自签名证书"
+echo "------------------------------"
+echo "  scp root@${SERVER_IP}:${SERVER_CRT} ."
+echo "------------------------------"

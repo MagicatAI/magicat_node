@@ -5,7 +5,7 @@
 ## 快速搭建 Hysteria2 节点
 
 ```bash
-curl -Ls https://raw.githubusercontent.com/MagicatAI/magicat_node/main/H2_install.sh | sudo bash
+curl -Ls https://raw.githubusercontent.com/MagicatAI/magicat_node/main/install.sh | sudo bash
 ```
 
 ---
