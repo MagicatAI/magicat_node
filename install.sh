@@ -42,19 +42,14 @@ KEY_SHA256=$(openssl x509 -in "$SERVER_CRT" -pubkey -noout | openssl pkey -pubin
 # sing-box 配置
 cat > "$SINGBOX_CONF" << EOF
 {
-  "log": { "level": "info" },
+  "log": {"disabled": true},
   "inbounds": [
     {
       "type": "hysteria2",
       "tag": "h2-in",
       "listen": "::",
       "listen_port": 443,
-      "users": [
-        {
-          "name": "user1",
-          "password": "${PASSWORD}"
-        }
-      ],
+      "users": [{"name": "user1", "password": "${PASSWORD}"}],
       "tls": {
         "enabled": true,
         "certificate_path": "${SERVER_CRT}",
@@ -103,7 +98,7 @@ systemctl status sing-box --no-pager
 # 客户端信息
 echo ""
 echo "------------------------------"
-echo "  Hysteria2 客户端配置"
+echo "  客户端配置"
 echo "------------------------------"
 cat << EOF
 {
@@ -112,10 +107,8 @@ cat << EOF
   "keysha256": "${KEY_SHA256}"
 }
 EOF
-
 echo "------------------------------"
-echo "  v2rayN/v2rayNG 一键导入链接"
+echo "  v2rayN/v2rayNG 配置导入链接"
 echo "------------------------------"
 echo "${HY2_URI}"
 echo "------------------------------"
-
