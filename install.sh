@@ -1,5 +1,8 @@
 #!/bin/bash
 set -e
+trap 'echo "部署失败 (第 ${LINENO} 行)"; exit 1' ERR
+[ "$(id -u)" -eq 0 ] || exit 1
+umask 077
 
 # 参数
 DOWNLOAD_URL="https://github.com/MagicatAI/magicat_node/releases/download/node_1.0.0.0/sing-box"
@@ -7,16 +10,15 @@ SINGBOX_BIN="/usr/local/bin/sing-box"
 SINGBOX_CONF="/etc/sing-box/config.json"
 SERVER_KEY="/etc/sing-box/server.key"
 SERVER_CRT="/etc/sing-box/server.crt"
-
 SERVER_IP=$(curl -s https://api.ipify.org)
-PASSWORD=$(openssl rand -base64 18 | tr -dc 'A-Za-z0-9' | head -c 24)
+PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 12)
 
 # 系统优化 (BBR)
 grep -q "net.core.default_qdisc=fq" /etc/sysctl.conf || \
   echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
 grep -q "net.ipv4.tcp_congestion_control=bbr" /etc/sysctl.conf || \
   echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
-sysctl -p
+sysctl -p || true
 
 # 目录 & 内核
 mkdir -p /etc/sing-box
@@ -31,13 +33,11 @@ openssl req -x509 -nodes -newkey ec -pkeyopt ec_paramgen_curve:P-256 \
   -days 3650 \
   -subj "/CN=cloudflare.com" \
   -addext "subjectAltName=IP:${SERVER_IP}"
-
 chown nobody "$SERVER_KEY" "$SERVER_CRT"
 chmod 600 "$SERVER_KEY" "$SERVER_CRT"
-
-CERT_PIN=$(openssl x509 -in "$SERVER_CRT" -outform der | openssl dgst -sha256 | awk '{print $2}')
+CERT_PIN=$(openssl x509 -in "$SERVER_CRT" -outform der | openssl dgst -sha256 -r | cut -d' ' -f1)
 HY2_URI="hysteria2://${PASSWORD}@${SERVER_IP}:443/?sni=cloudflare.com&pinSHA256=${CERT_PIN}#MagicatNode"
-KEY_SHA256=$(openssl x509 -in "$SERVER_CRT" -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64)
+KEY_SHA256=$(openssl x509 -in "$SERVER_CRT" -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl base64 -A)
 
 # sing-box 配置
 cat > "$SINGBOX_CONF" << EOF
@@ -63,6 +63,10 @@ cat > "$SINGBOX_CONF" << EOF
   ]
 }
 EOF
+chown -R nobody /etc/sing-box
+chmod 700 /etc/sing-box
+chown nobody "$SINGBOX_CONF"
+chmod 600 "$SINGBOX_CONF"
 
 # Systemd 服务
 cat > /etc/systemd/system/sing-box.service << 'EOF'
@@ -70,7 +74,6 @@ cat > /etc/systemd/system/sing-box.service << 'EOF'
 Description=sing-box Service
 Documentation=https://sing-box.sagernet.org
 After=network.target nss-lookup.target
-
 [Service]
 User=nobody
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
@@ -84,7 +87,6 @@ ProtectSystem=full
 ProtectHome=true
 PrivateTmp=true
 PrivateDevices=true
-
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -97,9 +99,9 @@ systemctl status sing-box --no-pager
 
 # 客户端信息
 echo ""
-echo "------------------------------"
+echo "--------------------------------"
 echo "  客户端配置"
-echo "------------------------------"
+echo "--------------------------------"
 cat << EOF
 {
   "serverip": "${SERVER_IP}",
@@ -107,8 +109,8 @@ cat << EOF
   "keysha256": "${KEY_SHA256}"
 }
 EOF
-echo "------------------------------"
+echo "--------------------------------"
 echo "  v2rayN/v2rayNG 配置导入链接"
-echo "------------------------------"
+echo "--------------------------------"
 echo "${HY2_URI}"
-echo "------------------------------"
+echo "--------------------------------"

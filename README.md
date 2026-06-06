@@ -14,7 +14,7 @@ curl -Ls https://raw.githubusercontent.com/MagicatAI/magicat_node/main/install.s
 
 | 项目 | 要求 |
 |------|------|
-| 操作系统 | Linux （Debian13.1+ / Ubuntu 24.04+） |
+| 操作系统 | Linux （Debian13.1+ / Ubuntu 24.04+）-amd64 |
 | 最低配置 | 1核1G |
 | 登录权限 | root |
 | 端口放行 |  UDP/443、SSH(22) |
