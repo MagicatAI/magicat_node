@@ -24,6 +24,7 @@ sysctl -p || true
 mkdir -p /etc/sing-box
 systemctl stop sing-box 2>/dev/null || true
 curl -fL -o "$SINGBOX_BIN" "$DOWNLOAD_URL"
+chmod +x "$SINGBOX_BIN"
 
 # 自签名证书
 openssl req -x509 -nodes -newkey ec -pkeyopt ec_paramgen_curve:P-256 \
@@ -65,6 +66,7 @@ EOF
 chown -R nobody /etc/sing-box
 chmod 700 /etc/sing-box
 chown nobody "$SINGBOX_CONF"
+chown nobody "$SINGBOX_BIN"
 chmod 600 "$SINGBOX_CONF"
 
 # Systemd 服务
@@ -91,7 +93,6 @@ WantedBy=multi-user.target
 EOF
 
 # 启动
-chmod +x "$SINGBOX_BIN"
 systemctl daemon-reload
 systemctl enable sing-box
 systemctl restart sing-box
