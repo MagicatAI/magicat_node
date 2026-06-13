@@ -14,7 +14,8 @@ curl -Ls https://raw.githubusercontent.com/MagicatAI/magicat_node/main/install.s
 
 | 项目 | 要求 |
 |------|------|
-| 操作系统 | Linux （Debian12+ / Ubuntu 24+）-amd64 |
+| 操作系统 | Debian12+ / Ubuntu 24+ |
+| 系统架构 | amd64 |
 | 最低配置 | 1核1G |
 | 登录权限 | root |
 | 端口放行 |  UDP/443、SSH(22) |
@@ -26,6 +27,6 @@ curl -Ls https://raw.githubusercontent.com/MagicatAI/magicat_node/main/install.s
 | 方式 | 地址 |
 |------|------|
 | QQ群 | 745961028 |
-| 博客 | https://magicat.work/ |
+| 官网 | https://magicat.work/ |
 
 ---

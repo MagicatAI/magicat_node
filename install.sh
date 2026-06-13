@@ -101,7 +101,7 @@ systemctl status sing-box --no-pager
 # 客户端信息
 echo ""
 echo "--------------------------------"
-echo "  客户端配置"
+echo "  PC端配置"
 echo "--------------------------------"
 cat << EOF
 {
@@ -111,7 +111,7 @@ cat << EOF
 }
 EOF
 echo "--------------------------------"
-echo "  v2rayN/v2rayNG 配置导入链接"
+echo "  v2rayN/v2rayNG 从剪贴板导入"
 echo "--------------------------------"
 echo "${HY2_URI}"
 echo "--------------------------------"
